@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spreadsheet Viewer</title>
+  <title>Column B Viewer</title>
   <style>
     /* Customize your styles here */
-    p {
-      font-size: 14px; /* Adjust font size as needed */
+    ul {
+      list-style-type: none;
     }
-    strong {
-      font-size: 16px; /* Bold font size */
+    li {
+      font-size: 14px; /* Adjust font size as needed */
     }
   </style>
 </head>
@@ -28,20 +28,15 @@
         // Parse CSV data
         const rows = csvData.split('\n').map(row => row.split(','));
 
-        // Filter rows where the first letter of the first word in column C is 'A'
-        const filteredRows = rows.slice(1).filter(row => row[2] && row[2].trim().toLowerCase().startsWith('a'));
+        // Extract data from column B
+        const columnBData = rows.slice(1).map(row => row[1]);
 
         // Generate HTML content
-        const htmlContent = filteredRows.map(row => `
-          <p>
-            <strong style="font-size: larger;">
-              <a href="mailto:${row[6]}">${row[1]}</a>
-            </strong>
-            ${row[3]}
-            <a href="${row[4]}">info</a>
-            ${row[5]}
-          </p>
-        `).join('');
+        const htmlContent = `
+          <ul>
+            ${columnBData.map(item => `<li>${item}</li>`).join('')}
+          </ul>
+        `;
 
         // Display the generated HTML content
         document.getElementById('output').innerHTML = htmlContent;
