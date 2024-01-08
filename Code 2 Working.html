@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Column B Viewer</title>
+  <style>
+    /* Customize your styles here */
+    ul {
+      list-style-type: none;
+    }
+    li {
+      font-size: 14px; /* Adjust font size as needed */
+    }
+  </style>
+</head>
+<body>
+  <div id="output"></div>
+
+  <script>
+    // Google Sheets CSV link
+    const csvLink = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSr2x02y__zYmesmC-BQwS3uUyetzwHwq37nD9DattuMKraiNWvz8qOcLbDTHMzuphqAAhk3kcL2EBj/pub?output=csv';
+
+    // Fetch data from the CSV link
+    fetch(csvLink)
+      .then(response => response.text())
+      .then(csvData => {
+        // Parse CSV data
+        const rows = csvData.split('\n').map(row => row.split(','));
+
+        // Filter rows based on condition (Column C starts with 'A')
+        const filteredRows = rows.slice(1).filter(row => {
+          const columnC = row[2] ? row[2].trim().toLowerCase() : '';
+          return columnC.startsWith('a');
+        });
+
+        // Generate HTML content
+        const htmlContent = `
+          <ul>
+            ${filteredRows.map(row => {
+              const columnB = row[1] || '';
+              const columnG = row[6] || '';
+              const columnC = row[2] || '';
+              const columnD = row[3] || '';
+              const columnE = row[4] || '';
+              const columnF = row[5] || '';
+
+              const emailSubject = encodeURIComponent(`I_own_the_source_film,_can_I_get_a_link_to_${columnC}`);
+              
+              return `
+                <li>
+                  <strong>
+                    <a href="mailto:${columnG}?subject=${emailSubject}" target="_blank">${columnB}</a>
+                  </strong>: 
+                  ${columnD} 
+                  <a href="${columnE}" target="_blank">info</a> 
+                  ${columnF}
+                </li>
+              `;
+            }).join('')}
+          </ul>
+        `;
+
+        // Display the generated HTML content
+        document.getElementById('output').innerHTML = htmlContent;
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  </script>
+</body>
+</html>
