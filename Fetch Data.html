@@ -1,57 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data from Google Sheet</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .entry {
-            margin-bottom: 10px;
-        }
-        .bold-link {
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spreadsheet Viewer</title>
+  <style>
+    /* Customize your styles here */
+    p {
+      font-size: 14px; /* Adjust font size as needed */
+    }
+    strong {
+      font-size: 16px; /* Bold font size */
+    }
+  </style>
 </head>
 <body>
+  <div id="output"></div>
 
-<div id="result"></div>
+  <script>
+    // Google Sheets CSV link
+    const csvLink = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSr2x02y__zYmesmC-BQwS3uUyetzwHwq37nD9DattuMKraiNWvz8qOcLbDTHMzuphqAAhk3kcL2EBj/pub?output=csv';
 
-<script>
-    // Replace 'YOUR_PUBLISHED_LINK' with the actual link you obtained after publishing the Google Spreadsheet
-    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSr2x02y__zYmesmC-BQwS3uUyetzwHwq37nD9DattuMKraiNWvz8qOcLbDTHMzuphqAAhk3kcL2EBj/pub?output=csv';
+    // Fetch data from the CSV link
+    fetch(csvLink)
+      .then(response => response.text())
+      .then(csvData => {
+        // Parse CSV data
+        const rows = csvData.split('\n').map(row => row.split(','));
 
-    // Function to fetch and process data from the Google Sheet
-    async function fetchData() {
-        const response = await fetch(sheetUrl);
-        const data = await response.text();
-        const rows = data.split('\n');
+        // Filter rows where the first letter of the first word in column C is 'A'
+        const filteredRows = rows.slice(1).filter(row => row[2] && row[2].trim().toLowerCase().startsWith('a'));
 
-        // Process and display the data
-        const resultDiv = document.getElementById('result');
-        rows.forEach(row => {
-            const columns = row.split(',');
+        // Generate HTML content
+        const htmlContent = filteredRows.map(row => `
+          <p>
+            <strong style="font-size: larger;">
+              <a href="mailto:${row[6]}">${row[1]}</a>
+            </strong>
+            ${row[3]}
+            <a href="${row[4]}">info</a>
+            ${row[5]}
+          </p>
+        `).join('');
 
-            // Extracting data from each column
-            const emailLink = `<a href="mailto:${columns[6]}">${columns[1]}</a>`;
-            const infoLink = `<a href="${columns[4]}" target="_blank">info</a>`;
-
-            // Constructing the HTML entry
-            const entry = `<div class="entry"><span class="bold-link">${emailLink}</span>: ${columns[3]} ${infoLink} ${columns[5]}</div>`;
-
-            // Appending the entry to the resultDiv
-            resultDiv.innerHTML += entry;
-        });
-    }
-
-    // Call the function to fetch and display data
-    fetchData();
-</script>
-
+        // Display the generated HTML content
+        document.getElementById('output').innerHTML = htmlContent;
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  </script>
 </body>
 </html>
-
