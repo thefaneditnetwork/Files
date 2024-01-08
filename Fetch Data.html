@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data from Google Sheet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .entry {
+            margin-bottom: 10px;
+        }
+        .bold-link {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+
+<div id="result"></div>
+
+<script>
+    // Replace 'YOUR_PUBLISHED_LINK' with the actual link you obtained after publishing the Google Spreadsheet
+    const sheetUrl = 'http://docs.google.com/spreadsheets/d/e/2PACX-1vSr2x02y__zYmesmC-BQwS3uUyetzwHwq37nD9DattuMKraiNWvz8qOcLbDTHMzuphqAAhk3kcL2EBj/pub?output=csv';
+
+    // Function to fetch and process data from the Google Sheet
+    async function fetchData() {
+        const response = await fetch(sheetUrl);
+        const data = await response.text();
+        const rows = data.split('\n');
+
+        // Process and display the data
+        const resultDiv = document.getElementById('result');
+        rows.forEach(row => {
+            const columns = row.split(',');
+
+            // Extracting data from each column
+            const emailLink = `<a href="mailto:${columns[6]}">${columns[1]}</a>`;
+            const infoLink = `<a href="${columns[4]}" target="_blank">info</a>`;
+
+            // Constructing the HTML entry
+            const entry = `<div class="entry"><span class="bold-link">${emailLink}</span>: ${columns[3]} ${infoLink} ${columns[5]}</div>`;
+
+            // Appending the entry to the resultDiv
+            resultDiv.innerHTML += entry;
+        });
+    }
+
+    // Call the function to fetch and display data
+    fetchData();
+</script>
+
+</body>
+</html>
+
